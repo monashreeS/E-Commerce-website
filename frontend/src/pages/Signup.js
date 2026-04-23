@@ -8,8 +8,9 @@ function Signup() {
     const [signupInfo, setSignupInfo] = useState({
         name: '',
         email: '',
-        password: ''
-    })
+        password: '',
+        branch: ''
+    });
 
     const navigate = useNavigate();
     const handleChange = (e) => {
@@ -22,8 +23,8 @@ function Signup() {
 
     const handleSignup = async (e) => {
         e.preventDefault();
-        const { name, email, password } = signupInfo;
-        if (!name || !email || !password) {
+        const { name, email, password, branch } = signupInfo;
+        if (!name || !email || !password||!branch) {
             return handleError('name, email and password are required')
         }
         try {
@@ -87,6 +88,21 @@ function Signup() {
                         placeholder='Enter your password...'
                         value={signupInfo.password}
                     />
+                </div>
+                <div>
+                <label htmlFor='branch'>Branch</label>
+                <select
+                    name='branch'
+                    value={signupInfo.branch}
+                    onChange={handleChange}
+                >
+                    <option value=''>Select Branch</option>
+                    <option value='CSE'>CSE</option>
+                    <option value='ECE'>ECE</option>
+                    <option value='Mechanical'>Mechanical</option>
+                    <option value='Civil'>Civil</option>
+                    <option value='ISE'>ISE</option>
+                </select>
                 </div>
                 <button type='submit'>Signup</button>
                 <span>Already have an account ?
