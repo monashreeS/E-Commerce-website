@@ -1,0 +1,49 @@
+.admin-wrap { display: grid; grid-template-columns: 240px 1fr; gap: 24px; padding: 32px 0; }
+.admin-side {
+  background: #fff; border: 1px solid var(--ink-100); border-radius: 16px; overflow: hidden; height: fit-content;
+}
+.admin-side-head {
+  background: var(--purple-800); color: #fff; padding: 18px 20px;
+  font-family: var(--font-display); font-weight: 800;
+}
+.admin-side nav { padding: 10px; }
+.admin-side nav button {
+  width: 100%; text-align: left; padding: 12px 14px; border-radius: 10px;
+  color: var(--ink-600); display: flex; align-items: center; gap: 10px; font-weight: 500;
+}
+.admin-side nav button:hover { background: var(--purple-50); color: var(--purple-700); }
+.admin-side nav button.active { background: var(--purple-100); color: var(--purple-800); font-weight: 700; }
+
+.admin-main { display: flex; flex-direction: column; gap: 20px; }
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.stat-card {
+  background: #fff; border: 1px solid var(--ink-100); border-radius: 16px; padding: 22px;
+}
+.stat-card .k { font-size: 13px; color: var(--ink-400); font-weight: 600; margin-bottom: 8px; }
+.stat-card .v { font-family: var(--font-display); font-size: 28px; font-weight: 800; color: var(--ink-900); }
+
+.panel {
+  background: #fff; border: 1px solid var(--ink-100); border-radius: 16px; padding: 22px;
+}
+.panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.panel-head h3 { font-family: var(--font-display); font-weight: 800; font-size: 18px; margin: 0; }
+
+.tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+.tbl th {
+  text-align: left; padding: 12px 14px; font-size: 12px; text-transform: uppercase;
+  letter-spacing: .04em; color: var(--ink-400); font-weight: 700; border-bottom: 1px solid var(--ink-100);
+}
+.tbl td { padding: 12px 14px; border-bottom: 1px solid var(--ink-100); color: var(--ink-700); }
+.tbl tr:last-child td { border-bottom: none; }
+.tbl .prod-mini { display: flex; align-items: center; gap: 10px; }
+.tbl .prod-mini img { width: 36px; height: 36px; object-fit: cover; border-radius: 8px; }
+
+/* Admin form */
+.product-form {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+}
+.product-form .full { grid-column: 1 / -1; }
+.product-form .field { margin-bottom: 0; }
+
+@media (max-width: 1100px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 900px) { .admin-wrap { grid-template-columns: 1fr; } .product-form { grid-template-columns: 1fr; } }

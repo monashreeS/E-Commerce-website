@@ -1,24 +1,35 @@
 const express = require('express');
-const app = express();
-const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 const cors = require('cors');
-const AuthRouter = require('./routes/AuthRouter');
-const ProductRouter = require('./routes/ProductRouter');
-
 require('dotenv').config();
-require('./models/db');
-const PORT = process.env.PORT || 8080;
 
-app.get('/ping', (req, res) => {
-    res.send('PONG');
+const app = express();
+
+/* ---------------- Middleware ---------------- */
+app.use(cors());
+app.use(express.json());
+
+/* ---------------- MongoDB Connection ---------------- */
+mongoose.connect(process.env.MONGO_CONN)
+  .then(() => console.log('MongoDB Connected'))
+  .catch((err) => console.log('MongoDB Error:', err));
+
+/* ---------------- Route Imports ---------------- */
+const authRoutes = require('./routes/auth');
+const productRoutes = require('./routes/products');
+
+/* ---------------- API Routes ---------------- */
+app.use('/api/auth', authRoutes);
+app.use('/api/products', productRoutes);
+
+/* ---------------- Test Route ---------------- */
+app.get('/', (req, res) => {
+  res.send('Backend Server Running...');
 });
 
-app.use(bodyParser.json());
-app.use(cors());
-app.use('/auth', AuthRouter);
-app.use('/products', ProductRouter);
-
+/* ---------------- Server Start ---------------- */
+const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => {
-    console.log(`Server is running on ${PORT}`)
-})
+  console.log(`Server is running on ${PORT}`);
+});

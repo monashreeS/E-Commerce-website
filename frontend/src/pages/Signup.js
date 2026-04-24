@@ -1,153 +1,221 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { ToastContainer } from 'react-toastify';
-import { handleError, handleSuccess } from '../utils';
+import React, {
+  useState,
+} from 'react';
 
-function Signup() {
+import {
+  Link,
+  useNavigate,
+} from 'react-router-dom';
 
-    const [signupInfo, setSignupInfo] = useState({
-        name: '',
-        email: '',
-        password: '',
-        branch: ''
+import { useAuth } from '../context/AuthContext';
+
+const BRANCHES = [
+  'CSE',
+  'ECE',
+  'EEE',
+  'ME',
+  'CE',
+  'AIDS',
+  'IT',
+  'Other',
+];
+
+export default function Signup() {
+  const { signup } =
+    useAuth();
+
+  const navigate =
+    useNavigate();
+
+  const [form, setForm] =
+    useState({
+      name: '',
+      email: '',
+      password: '',
+      branch: 'CSE',
     });
-    
-    const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
-    
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        const copySignupInfo = { ...signupInfo };
-        copySignupInfo[name] = value;
-        setSignupInfo(copySignupInfo);
+
+  const [err, setErr] =
+    useState('');
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const set =
+    (key) => (e) =>
+      setForm({
+        ...form,
+        [key]:
+          e.target.value,
+      });
+
+  const submit =
+    async (e) => {
+      e.preventDefault();
+
+      setErr('');
+      setLoading(true);
+
+      try {
+        await signup(form);
+        navigate('/');
+      } catch (e2) {
+        setErr(
+          e2.response?.data
+            ?.message ||
+            'Signup failed'
+        );
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const handleSignup = async (e) => {
-        e.preventDefault();
-        const { name, email, password, branch } = signupInfo;
-        
-        if (!name || !email || !password || !branch) {
-            return handleError('Name, email, password and branch are required');
-        }
-        
-        // FIX: Added basic email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            return handleError('Please enter a valid email');
-        }
-        
-        // FIX: Added password strength validation
-        if (password.length < 4) {
-            return handleError('Password must be at least 4 characters');
-        }
-        
-        try {
-            setLoading(true);
-            
-            // FIX: Use environment variable
-            const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-            const url = `${apiUrl}/auth/signup`;
-            
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(signupInfo)
-            });
-            
-            // FIX: Added response status checking
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const result = await response.json();
-            const { success, message, error } = result;
-            
-            if (success) {
-                handleSuccess(message);
-                setTimeout(() => {
-                    navigate('/login');
-                }, 1000);
-            } else if (error) {
-                const details = error?.details?.[0]?.message || message;
-                handleError(details);
-            } else if (!success) {
-                handleError(message);
-            }
-            
-        } catch (err) {
-            console.error('Signup error:', err);
-            handleError(err.message || 'Failed to signup');
-        } finally {
-            setLoading(false);
-        }
-    };
-    
-    return (
-        <div className='container'>
-            <h1>Signup</h1>
-            <form onSubmit={handleSignup}>
-                <div>
-                    <label htmlFor='name'>Name</label>
-                    <input
-                        onChange={handleChange}
-                        type='text'
-                        name='name'
-                        autoFocus
-                        placeholder='Enter your name...'
-                        value={signupInfo.name}
-                        required
-                    />
-                </div>
-                <div>
-                    <label htmlFor='email'>Email</label>
-                    <input
-                        onChange={handleChange}
-                        type='email'
-                        name='email'
-                        placeholder='Enter your email...'
-                        value={signupInfo.email}
-                        required
-                    />
-                </div>
-                <div>
-                    <label htmlFor='password'>Password</label>
-                    <input
-                        onChange={handleChange}
-                        type='password'
-                        name='password'
-                        placeholder='Enter your password...'
-                        value={signupInfo.password}
-                        required
-                    />
-                </div>
-                <div>
-                    <label htmlFor='branch'>Branch</label>
-                    <select
-                        name='branch'
-                        value={signupInfo.branch}
-                        onChange={handleChange}
-                        required
-                    >
-                        <option value=''>Select Branch</option>
-                        <option value='CSE'>CSE</option>
-                        <option value='ECE'>ECE</option>
-                        <option value='Mechanical'>Mechanical</option>
-                        <option value='Civil'>Civil</option>
-                        <option value='ISE'>ISE</option>
-                    </select>
-                </div>
-                <button type='submit' disabled={loading}>
-                    {loading ? 'Creating Account...' : 'Signup'}
-                </button>
-                <span>Already have an account?
-                    <Link to="/login"> Login</Link>
-                </span>
-            </form>
-            <ToastContainer />
+  return (
+    <div className="auth-wrap">
+      <div
+        className="auth-card"
+        data-testid="signup-card"
+      >
+        <div className="auth-logo">
+          EduTech Store
         </div>
-    );
-}
 
-export default Signup;
+        <h2>
+          Create your
+          account
+        </h2>
+
+        <p className="auth-sub">
+          Get personalized
+          picks for your
+          branch.
+        </p>
+
+        {err && (
+          <div
+            className="alert-error"
+            data-testid="signup-error"
+          >
+            {err}
+          </div>
+        )}
+
+        <form
+          onSubmit={
+            submit
+          }
+        >
+          <div className="field">
+            <label>
+              Full Name
+            </label>
+
+            <input
+              className="input"
+              value={
+                form.name
+              }
+              onChange={set(
+                'name'
+              )}
+              required
+              data-testid="signup-name-input"
+            />
+          </div>
+
+          <div className="field">
+            <label>
+              Email
+            </label>
+
+            <input
+              className="input"
+              type="email"
+              value={
+                form.email
+              }
+              onChange={set(
+                'email'
+              )}
+              required
+              data-testid="signup-email-input"
+            />
+          </div>
+
+          <div className="field">
+            <label>
+              Password
+            </label>
+
+            <input
+              className="input"
+              type="password"
+              value={
+                form.password
+              }
+              onChange={set(
+                'password'
+              )}
+              required
+              minLength={6}
+              data-testid="signup-password-input"
+            />
+          </div>
+
+          <div className="field">
+            <label>
+              Branch
+            </label>
+
+            <select
+              className="select"
+              value={
+                form.branch
+              }
+              onChange={set(
+                'branch'
+              )}
+              data-testid="signup-branch-select"
+            >
+              {BRANCHES.map(
+                (
+                  b
+                ) => (
+                  <option
+                    key={b}
+                    value={b}
+                  >
+                    {b}
+                  </option>
+                )
+              )}
+            </select>
+          </div>
+
+          <button
+            className="btn btn-primary btn-block"
+            disabled={
+              loading
+            }
+            data-testid="signup-submit-button"
+          >
+            {loading
+              ? 'Creating...'
+              : 'Sign Up'}
+          </button>
+        </form>
+
+        <div className="auth-foot">
+          Already have
+          an account?{' '}
+          <Link
+            to="/login"
+            data-testid="signup-login-link"
+          >
+            Sign in
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}

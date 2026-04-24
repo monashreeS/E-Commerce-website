@@ -1,128 +1,235 @@
-import React, { useEffect, useState, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom';
-import { handleError, handleSuccess } from '../utils';
-import { ToastContainer } from 'react-toastify';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import {
+  Truck,
+  ShieldCheck,
+  Percent,
+  Lock,
+  Laptop,
+  Headphones,
+  Smartphone,
+  Monitor,
+  Package,
+} from 'lucide-react';
 
-function Home() {
-    const [loggedInUser, setLoggedInUser] = useState('');
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
-    
-    useEffect(() => {
-        setLoggedInUser(localStorage.getItem('loggedInUser'));
-    }, []);
+import api from '../api/axios';
+import ProductCard from '../components/ProductCard';
+import { useAuth } from '../context/AuthContext';
 
-    const handleLogout = (e) => {
-        e.preventDefault();
-        localStorage.removeItem('token');
-        localStorage.removeItem('loggedInUser');
-        handleSuccess('User Logged out');
-        setTimeout(() => {
-            navigate('/login');
-        }, 1000);
+const CATS = [
+  { name: 'Laptops', Icon: Laptop },
+  { name: 'Accessories', Icon: Headphones },
+  { name: 'Mobiles', Icon: Smartphone },
+  { name: 'Smart TV', Icon: Monitor },
+  { name: 'Others', Icon: Package },
+];
+
+export default function Home() {
+  const { user } = useAuth();
+
+  const [recommended, setRecommended] = useState([]);
+  const [featured, setFeatured] = useState([]);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const branch = user?.branch || 'CSE';
+
+        const [rec, feat] = await Promise.all([
+          api.get(`/products?branch=${branch}&limit=6`),
+          api.get('/products?featured=true&limit=6'),
+        ]);
+
+        setRecommended(rec.data.products);
+        setFeatured(feat.data.products);
+      } catch (error) {
+        console.error(error);
+      }
     };
 
-    // FIX: Wrap fetchProducts in useCallback to avoid dependency issues
-    const fetchProducts = useCallback(async () => {
-        try {
-            setLoading(true);
-            
-            const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-            const url = `${apiUrl}/products`;
-            
-            const token = localStorage.getItem('token');
-            
-            if (!token) {
-                handleError('No authentication token found');
-                navigate('/login');
-                return;
-            }
-            
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            if (!response.ok) {
-                if (response.status === 403) {
-                    handleError('Unauthorized. Please login again');
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('loggedInUser');
-                    navigate('/login');
-                    return;
-                }
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const result = await response.json();
-            console.log('Products response:', result);
-            
-            if (result.success && result.data) {
-                setProducts(result.data);
-            } else if (Array.isArray(result)) {
-                setProducts(result);
-            } else {
-                setProducts([]);
-            }
-            
-        } catch (err) {
-            console.error('Fetch error:', err);
-            handleError(err.message || 'Failed to fetch products');
-        } finally {
-            setLoading(false);
-        }
-    }, [navigate]); // FIX: Added navigate as dependency
-    
-    useEffect(() => {
-        fetchProducts();
-    }, [fetchProducts]); // FIX: Now fetchProducts is included in dependencies
+    loadProducts();
+  }, [user]);
 
-    return (
-        <div className='home-container'>
-            <div className='header'>
-                <h1>Welcome, {loggedInUser || 'User'}</h1>
-                <button onClick={handleLogout} className='logout-btn'>
-                    Logout
-                </button>
-            </div>
-            
-            <div className='products-section'>
-                <h2>Products</h2>
-                
-                {loading && <p className='loading'>Loading products...</p>}
-                
-                {!loading && products.length === 0 && (
-                    <p className='no-products'>No products available</p>
-                )}
-                
-                {!loading && products.length > 0 && (
-                    <div className='products-grid'>
-                        {products.map((item) => (
-                            <div key={item._id} className='product-card'>
-                                <h3>{item.name}</h3>
-                                <p className='price'>₹ {item.price}</p>
-                                {item.description && (
-                                    <p className='description'>{item.description}</p>
-                                )}
-                                {item.category && (
-                                    <p className='category'>Category: {item.category}</p>
-                                )}
-                                <button className='add-to-cart-btn'>
-                                    Add to Cart
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
-            
-            <ToastContainer />
+  return (
+    <div className="container">
+      {/* Hero */}
+      <section
+        className="hero"
+        data-testid="hero-section"
+      >
+        <div>
+          <h1>Best Tech for Students</h1>
+
+          <p>
+            Find the best laptops,
+            accessories and electronics for
+            your academic journey.
+          </p>
+
+          <div className="hero-ctas">
+            <Link
+              to="/products"
+              className="btn btn-primary"
+              data-testid="hero-shop-now"
+            >
+              Shop Now
+            </Link>
+
+            <Link
+              to="/products"
+              className="btn btn-outline"
+              data-testid="hero-explore"
+            >
+              Explore Categories
+            </Link>
+          </div>
         </div>
-    );
-}
 
-export default Home;
+        <div className="hero-art">
+          <img
+            src="https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=900"
+            alt="Student laptop setup"
+          />
+        </div>
+      </section>
+
+      {/* Benefits */}
+      <section
+        className="benefits"
+        data-testid="benefits-section"
+      >
+        {[
+          {
+            Icon: Truck,
+            t: 'Free Shipping',
+            s: 'On orders above ₹999',
+          },
+          {
+            Icon: ShieldCheck,
+            t: 'Best Quality',
+            s: 'Top quality products',
+          },
+          {
+            Icon: Percent,
+            t: 'Student Discounts',
+            s: 'Extra 10% off',
+          },
+          {
+            Icon: Lock,
+            t: 'Secure Payments',
+            s: '100% secure checkout',
+          },
+        ].map(({ Icon, t, s }) => (
+          <div
+            className="benefit"
+            key={t}
+          >
+            <div className="benefit-icon">
+              <Icon size={22} />
+            </div>
+
+            <div>
+              <h4>{t}</h4>
+              <p>{s}</p>
+            </div>
+          </div>
+        ))}
+      </section>
+
+      {/* Categories */}
+      <section className="section">
+        <div className="heading-row">
+          <h2>Shop by Category</h2>
+
+          <Link to="/products">
+            View All
+          </Link>
+        </div>
+
+        <div className="category-pills">
+          {CATS.map(
+            ({ name, Icon }) => (
+              <Link
+                key={name}
+                to={`/products?category=${encodeURIComponent(
+                  name
+                )}`}
+                className="category-pill"
+                data-testid={`category-${name}`}
+              >
+                <div className="pill-ic">
+                  <Icon size={24} />
+                </div>
+
+                <div className="pill-name">
+                  {name}
+                </div>
+              </Link>
+            )
+          )}
+        </div>
+      </section>
+
+      {/* Recommended */}
+      <section className="section">
+        <div className="heading-row">
+          <h2>
+            Recommended for{' '}
+            {user?.branch || 'CSE'} Students
+          </h2>
+
+          <Link to="/products">
+            View All
+          </Link>
+        </div>
+
+        {recommended.length ? (
+          <div
+            className="product-row"
+            data-testid="recommended-list"
+          >
+            {recommended.map((p) => (
+              <ProductCard
+                key={p._id}
+                product={p}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="empty-state">
+            Loading recommendations...
+          </div>
+        )}
+      </section>
+
+      {/* Featured */}
+      <section className="section">
+        <div className="heading-row">
+          <h2>Featured Products</h2>
+
+          <Link to="/products">
+            View All
+          </Link>
+        </div>
+
+        {featured.length ? (
+          <div
+            className="product-row"
+            data-testid="featured-list"
+          >
+            {featured.map((p) => (
+              <ProductCard
+                key={p._id}
+                product={p}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="empty-state">
+            No featured products yet.
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}

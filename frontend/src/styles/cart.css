@@ -1,0 +1,35 @@
+
+.cart-wrap { display: grid; grid-template-columns: 1.6fr 1fr; gap: 24px; padding: 32px 0; }
+.cart-card { background: #fff; border: 1px solid var(--ink-100); border-radius: 16px; overflow: hidden; }
+.cart-card-head {
+  background: var(--purple-700); color: #fff; padding: 18px 22px;
+  font-family: var(--font-display); font-weight: 800; font-size: 18px;
+}
+.cart-table { width: 100%; border-collapse: collapse; }
+.cart-table th {
+  text-align: left; padding: 14px 16px; font-size: 12px; text-transform: uppercase;
+  letter-spacing: .04em; color: var(--ink-400); border-bottom: 1px solid var(--ink-100); font-weight: 700;
+}
+.cart-table td { padding: 16px; border-bottom: 1px solid var(--ink-100); vertical-align: middle; font-size: 14px; }
+.cart-product { display: flex; align-items: center; gap: 14px; }
+.cart-product img { width: 58px; height: 58px; object-fit: cover; border-radius: 10px; background: var(--ink-50); }
+.cart-product .pname { font-weight: 600; color: var(--ink-900); }
+.cart-product .pprice { color: var(--ink-400); font-size: 13px; margin-top: 2px; }
+.cart-remove { color: var(--danger); }
+.cart-remove:hover { background: #FEE2E2; border-radius: 8px; padding: 6px; }
+
+.summary {
+  background: #fff; border: 1px solid var(--ink-100); border-radius: 16px;
+  padding: 0; overflow: hidden; height: fit-content; position: sticky; top: 92px;
+}
+.summary-rows { padding: 20px 22px; }
+.summary .row { display: flex; justify-content: space-between; padding: 8px 0; color: var(--ink-600); font-size: 15px; }
+.summary .row.total { border-top: 1px solid var(--ink-100); padding-top: 14px; margin-top: 6px; font-weight: 800; font-size: 18px; color: var(--ink-900); }
+.summary .free { color: var(--success); font-weight: 600; }
+.summary-btn { padding: 18px 22px; background: var(--purple-50); }
+
+.cart-empty { text-align: center; padding: 80px 24px; background: #fff; border: 1px dashed var(--ink-200); border-radius: 16px; }
+.cart-empty h3 { margin: 12px 0 6px; }
+.cart-empty p { margin: 0 0 18px; color: var(--ink-400); }
+
+@media (max-width: 900px) { .cart-wrap { grid-template-columns: 1fr; } .summary { position: static; } }

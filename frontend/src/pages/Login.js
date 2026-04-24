@@ -1,114 +1,146 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { ToastContainer } from 'react-toastify';
-import { handleError, handleSuccess } from '../utils';
 
-function Login() {
+import React, { useState } from 'react';
+import {
+  Link,
+  useNavigate,
+  useLocation,
+} from 'react-router-dom';
 
-    const [loginInfo, setLoginInfo] = useState({
-        email: '',
-        password: ''
-    });
-    
-    const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
+import { useAuth } from '../context/AuthContext';
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        const copyLoginInfo = { ...loginInfo };
-        copyLoginInfo[name] = value;
-        setLoginInfo(copyLoginInfo);
-    };
+export default function Login() {
+  const { login } = useAuth();
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        const { email, password } = loginInfo;
-        
-        if (!email || !password) {
-            return handleError('Email and password are required');
-        }
-        
-        try {
-            setLoading(true);
-            
-            // FIX: Use environment variable
-            const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-            const url = `${apiUrl}/auth/login`;
-            
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(loginInfo)
-            });
-            
-            // FIX: Added response status checking
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const result = await response.json();
-            const { success, message, jwtToken, name, error } = result;
-            
-            if (success) {
-                handleSuccess(message);
-                localStorage.setItem('token', jwtToken);
-                localStorage.setItem('loggedInUser', name);
-                setTimeout(() => {
-                    navigate('/home');
-                }, 1000);
-            } else if (error) {
-                const details = error?.details?.[0]?.message || message;
-                handleError(details);
-            } else if (!success) {
-                handleError(message);
-            }
-            
-        } catch (err) {
-            console.error('Login error:', err);
-            handleError(err.message || 'Failed to login');
-        } finally {
-            setLoading(false);
-        }
-    };
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    return (
-        <div className='container'>
-            <h1>Login</h1>
-            <form onSubmit={handleLogin}>
-                <div>
-                    <label htmlFor='email'>Email</label>
-                    <input
-                        onChange={handleChange}
-                        type='email'
-                        name='email'
-                        placeholder='Enter your email...'
-                        value={loginInfo.email}
-                        required
-                    />
-                </div>
-                <div>
-                    <label htmlFor='password'>Password</label>
-                    <input
-                        onChange={handleChange}
-                        type='password'
-                        name='password'
-                        placeholder='Enter your password...'
-                        value={loginInfo.password}
-                        required
-                    />
-                </div>
-                <button type='submit' disabled={loading}>
-                    {loading ? 'Logging in...' : 'Login'}
-                </button>
-                <span>Don't have an account?
-                    <Link to="/signup"> Signup</Link>
-                </span>
-            </form>
-            <ToastContainer />
+  const [email, setEmail] = useState('');
+  const [password, setPassword] =
+    useState('');
+  const [err, setErr] = useState('');
+  const [loading, setLoading] =
+    useState(false);
+
+  const submit = async (e) => {
+    e.preventDefault();
+
+    setErr('');
+    setLoading(true);
+
+    try {
+      const u = await login(
+        email.trim(),
+        password
+      );
+
+      navigate(
+        u.role === 'admin'
+          ? '/admin'
+          : location.state?.from || '/'
+      );
+    } catch (e2) {
+      setErr(
+        e2.response?.data?.message ||
+          'Login failed'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="auth-wrap">
+      <div
+        className="auth-card"
+        data-testid="login-card"
+      >
+        <div className="auth-logo">
+          EduTech Store
         </div>
-    );
-}
 
-export default Login;
+        <h2>Welcome back</h2>
+
+        <p className="auth-sub">
+          Sign in to continue shopping for
+          your academic journey.
+        </p>
+
+        {err && (
+          <div
+            className="alert-error"
+            data-testid="login-error"
+          >
+            {err}
+          </div>
+        )}
+
+        <form onSubmit={submit}>
+          <div className="field">
+            <label>Email</label>
+
+            <input
+              className="input"
+              type="email"
+              placeholder="you@college.edu"
+              value={email}
+              onChange={(e) =>
+                setEmail(e.target.value)
+              }
+              required
+              data-testid="login-email-input"
+            />
+          </div>
+
+          <div className="field">
+            <label>Password</label>
+
+            <input
+              className="input"
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) =>
+                setPassword(
+                  e.target.value
+                )
+              }
+              required
+              data-testid="login-password-input"
+            />
+          </div>
+
+          <button
+            className="btn btn-primary btn-block"
+            disabled={loading}
+            data-testid="login-submit-button"
+          >
+            {loading
+              ? 'Signing in...'
+              : 'Login'}
+          </button>
+        </form>
+
+        <div
+          className="auth-hint"
+          data-testid="login-hint"
+        >
+          Admin:
+          admin@edutech.com /
+          Admin@123 — Student:
+          student@edutech.com /
+          Student@123
+        </div>
+
+        <div className="auth-foot">
+          New here?{' '}
+          <Link
+            to="/signup"
+            data-testid="login-signup-link"
+          >
+            Create an account
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}

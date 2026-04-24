@@ -1,0 +1,107 @@
+
+
+.hero {
+  background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%);
+  border-radius: 24px; padding: 48px;
+  display: grid; grid-template-columns: 1.1fr .9fr; gap: 32px; align-items: center;
+  margin-top: 24px;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; right: -80px; top: -80px;
+  width: 360px; height: 360px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(196,181,253,.55), transparent 70%);
+}
+.hero h1 {
+  font-family: var(--font-display); font-size: 52px; line-height: 1.05;
+  letter-spacing: -0.03em; margin: 0 0 16px; color: var(--ink-900);
+}
+.hero p { font-size: 18px; color: var(--ink-500); margin: 0 0 28px; max-width: 460px; }
+.hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; }
+.hero-art {
+  position: relative; height: 320px; border-radius: 20px;
+  background: #fff; display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-lg); overflow: hidden;
+}
+.hero-art img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Benefits strip */
+.benefits {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  background: #fff; border: 1px solid var(--ink-100);
+  border-radius: 18px; padding: 20px; margin-top: 24px;
+  box-shadow: var(--shadow-sm);
+}
+.benefit {
+  display: flex; align-items: center; gap: 14px; padding: 6px 10px;
+}
+.benefit-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: var(--purple-50); color: var(--purple-700);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.benefit h4 { margin: 0 0 2px; font-size: 15px; font-weight: 700; }
+.benefit p { margin: 0; font-size: 13px; color: var(--ink-400); }
+
+/* Section heading row */
+.heading-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 18px; }
+.heading-row h2 { font-family: var(--font-display); font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.02em; }
+.heading-row a { color: var(--purple-700); font-weight: 600; font-size: 14px; }
+.heading-row a:hover { text-decoration: underline; }
+
+/* Category pills */
+.category-pills { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+.category-pill {
+  background: #fff; border: 1px solid var(--ink-100);
+  border-radius: 16px; padding: 20px; text-align: center;
+  transition: transform .18s, border-color .18s, box-shadow .18s;
+}
+.category-pill:hover {
+  transform: translateY(-3px); border-color: var(--purple-300);
+  box-shadow: var(--shadow);
+}
+.category-pill .pill-ic {
+  width: 52px; height: 52px; border-radius: 14px; margin: 0 auto 12px;
+  background: var(--purple-50); color: var(--purple-700);
+  display: flex; align-items: center; justify-content: center;
+}
+.category-pill .pill-name { font-weight: 700; font-size: 15px; color: var(--ink-700); }
+
+/* Featured product strip */
+.product-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+@media (max-width: 1100px) { .product-row { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 720px)  { .product-row { grid-template-columns: repeat(2, 1fr); } }
+
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; padding: 28px; }
+  .hero h1 { font-size: 36px; }
+  .hero-art { height: 240px; }
+  .benefits { grid-template-columns: repeat(2, 1fr); }
+  .category-pills { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Product Card (shared) */
+.pcard {
+  background: #fff; border: 1px solid var(--ink-100);
+  border-radius: 16px; overflow: hidden; position: relative;
+  transition: transform .2s, box-shadow .2s, border-color .2s;
+  display: flex; flex-direction: column;
+}
+.pcard:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: var(--purple-200); }
+.pcard-img {
+  aspect-ratio: 1 / 0.88; overflow: hidden; background: var(--ink-50);
+}
+.pcard-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
+.pcard:hover .pcard-img img { transform: scale(1.05); }
+.pcard-body { padding: 14px 14px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.pcard-name { font-weight: 600; font-size: 14px; color: var(--ink-900); line-height: 1.35;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 38px; }
+.pcard-foot {
+  display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 8px;
+}
+.pcard-price { font-weight: 800; font-size: 17px; color: var(--purple-700); }
+.pcard-cart {
+  width: 38px; height: 38px; border-radius: 10px; background: var(--purple-50); color: var(--purple-700);
+  display: flex; align-items: center; justify-content: center; transition: background .15s, color .15s;
+}
+.pcard-cart:hover { background: var(--purple-700); color: #fff; }
