@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Link,
@@ -15,11 +14,10 @@ export default function Login() {
   const location = useLocation();
 
   const [email, setEmail] = useState('');
-  const [password, setPassword] =
-    useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // 👁️ NEW
   const [err, setErr] = useState('');
-  const [loading, setLoading] =
-    useState(false);
+  const [loading, setLoading] = useState(false);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -75,6 +73,7 @@ export default function Login() {
         )}
 
         <form onSubmit={submit}>
+          {/* EMAIL */}
           <div className="field">
             <label>Email</label>
 
@@ -91,24 +90,43 @@ export default function Login() {
             />
           </div>
 
+          {/* PASSWORD WITH EYE ICON */}
           <div className="field">
             <label>Password</label>
 
-            <input
-              className="input"
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) =>
-                setPassword(
-                  e.target.value
-                )
-              }
-              required
-              data-testid="login-password-input"
-            />
+            <div style={{ position: "relative" }}>
+              <input
+                className="input"
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) =>
+                  setPassword(e.target.value)
+                }
+                required
+                autoComplete="current-password"
+                data-testid="login-password-input"
+              />
+
+              <span
+                onClick={() =>
+                  setShowPassword(!showPassword)
+                }
+                style={{
+                  position: "absolute",
+                  right: "12px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  cursor: "pointer",
+                  fontSize: "18px"
+                }}
+              >
+                {showPassword ? "🙈" : "👁️"}
+              </span>
+            </div>
           </div>
 
+          {/* BUTTON */}
           <button
             className="btn btn-primary btn-block"
             disabled={loading}
@@ -124,11 +142,6 @@ export default function Login() {
           className="auth-hint"
           data-testid="login-hint"
         >
-          Admin:
-          admin@edutech.com /
-          Admin@123 — Student:
-          student@edutech.com /
-          Student@123
         </div>
 
         <div className="auth-foot">
