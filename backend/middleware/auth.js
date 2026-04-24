@@ -11,7 +11,7 @@ const protect = async (req, res, next) => {
         message: 'No token provided' 
       });
     }
-    
+    //..
     const token = auth.slice(7);
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
